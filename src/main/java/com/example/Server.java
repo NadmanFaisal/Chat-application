@@ -1,59 +1,60 @@
 package com.example;
 
-// A Java program for a Server
 import java.net.*;
 import java.io.*;
 
 public class Server
 {
-	//initialize socket and input stream
-	private Socket		 socket = null;
+	// Initizlizss the socket, server and input
+	private Socket socket = null;
 	private ServerSocket server = null;
-	private DataInputStream in	 = null;
+	private DataInputStream input = null;
 
-	// constructor with port
+
 	public Server(int port)
 	{
-		// starts server and waits for a connection
+
 		try
 		{
+            // Creates a server and waits for connection
 			server = new ServerSocket(port);
 			System.out.println("Server started");
 
 			System.out.println("Waiting for a client ...");
 
+            // Accepts connection with client
 			socket = server.accept();
 			System.out.println("Client accepted");
 
-			// takes input from the client socket
-			in = new DataInputStream(
+			// Creates inputstream to get input from client
+			input = new DataInputStream(
 				new BufferedInputStream(socket.getInputStream()));
 
-			String line = "";
+			String clientMessage = "";
 
-			// reads message from client until "Over" is sent
-			while (!line.equals("Over"))
+			// Reads messages sent from the client until
+			while (!clientMessage.equals("Over"))
 			{
 				try
 				{
-					line = in.readUTF();
-					System.out.println(line);
+					clientMessage = input.readUTF();
+					System.out.println(clientMessage);
 
 				}
-				catch(IOException i)
+				catch(IOException e)
 				{
-					System.out.println(i);
+					System.out.println(e);
 				}
 			}
 			System.out.println("Closing connection");
 
-			// close connection
+			// Close connections to avoid leaks
 			socket.close();
-			in.close();
+			input.close();
 		}
-		catch(IOException i)
+		catch(IOException e)
 		{
-			System.out.println(i);
+			System.out.println(e);
 		}
 	}
 
