@@ -1,39 +1,64 @@
 package com.example;
-import java.io.*;
+
+// A Java program for a Server
 import java.net.*;
+import java.io.*;
 
-public class Server {
-    private static final String SERVER_ADDRESS = "localhost";
-    private static final int PORT = 8080;
+public class Server
+{
+	//initialize socket and input stream
+	private Socket		 socket = null;
+	private ServerSocket server = null;
+	private DataInputStream in	 = null;
 
-    private static void main(String[] args) {
-        try {
-        Socket socket = new Socket(SERVER_ADDRESS, PORT);
-        System.out.println("Connected to the server succesfully!");
+	// constructor with port
+	public Server(int port)
+	{
+		// starts server and waits for a connection
+		try
+		{
+			server = new ServerSocket(port);
+			System.out.println("Server started");
 
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			System.out.println("Waiting for a client ...");
 
-        new Thread(() -> {
-            try {
-                String message;
-                while ((message = in.readLine()) != null) {
-                    System.out.println(message);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }).start();
+			socket = server.accept();
+			System.out.println("Client accepted");
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String userInput;
-        while ((userInput = reader.readLine()) != null) {
-            out.println(userInput);
-        }
+			// takes input from the client socket
+			in = new DataInputStream(
+				new BufferedInputStream(socket.getInputStream()));
 
-    } catch(IOException e) {
-        e.printStackTrace();
-    }
-           
-    }
+			String line = "";
+
+			// reads message from client until "Over" is sent
+			while (!line.equals("Over"))
+			{
+				try
+				{
+					line = in.readUTF();
+					System.out.println(line);
+
+				}
+				catch(IOException i)
+				{
+					System.out.println(i);
+				}
+			}
+			System.out.println("Closing connection");
+
+			// close connection
+			socket.close();
+			in.close();
+		}
+		catch(IOException i)
+		{
+			System.out.println(i);
+		}
+	}
+
+	public static void main(String args[])
+	{
+		Server server = new Server(5000);
+	}
 }
