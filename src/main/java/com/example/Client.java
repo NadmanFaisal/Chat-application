@@ -1,28 +1,29 @@
 package com.example;
 
-// A Java program for a Client
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
 public class Client {
-	// initialize socket and input output streams
-	private Socket socket = null;
-	private Scanner input = null;
-	private DataOutputStream out = null;
+	// initialize socket and input output
+	private Socket socket;
+	private Scanner input;
+	private DataOutputStream out;
 
-	// constructor to put ip address and port
+
 	public Client(String address, int port)
 	{
-		// establish a connection
+
 		try {
+
+			// Establishes connection using the address and port
 			socket = new Socket(address, port);
 			System.out.println("Connected");
 
-			// takes input from terminal
+			// Creates input stream to gather user inputs
 			input = new Scanner(System.in);
 
-			// sends output to the socket
+			// Creates the output stream to send user inputs to the socket
 			out = new DataOutputStream(
 				socket.getOutputStream());
 		}
@@ -30,33 +31,35 @@ public class Client {
 			System.out.println(u);
 			return;
 		}
-		catch (IOException i) {
-			System.out.println(i);
+		catch (IOException e) {
+			System.out.println(e);
 			return;
 		}
 
-		// string to read message from input
-		String line = "";
+		// variable to store user input
+		String message = "";
 
 		// keep reading until "Over" is input
-		while (!line.equals("Over")) {
+		while (!message.equals("Over")) {
 			try {
-				line = input.nextLine();
-				out.writeUTF(line);
+				message = input.nextLine();
+
+				// Sends the input to the socket
+				out.writeUTF(message);
 			}
-			catch (IOException i) {
-				System.out.println(i);
+			catch (IOException e) {
+				System.out.println(e);
 			}
 		}
 
-		// close the connection
+		// Close the connections to avoid leaks
 		try {
 			input.close();
 			out.close();
 			socket.close();
 		}
-		catch (IOException i) {
-			System.out.println(i);
+		catch (IOException e) {
+			System.out.println(e);
 		}
 	}
 
