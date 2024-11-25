@@ -1,15 +1,20 @@
 package com.example;
 
 import java.net.*;
+import java.util.ArrayList;
 import java.io.*;
 
 public class ClientHandler implements Runnable {
     private Socket client;
     private DataInputStream input;
+    private DataOutputStream output;
+    private ArrayList<ClientHandler> clients;
 
-    public ClientHandler(Socket clientSocket) throws IOException {
+    public ClientHandler(Socket clientSocket, ArrayList<ClientHandler> clients) throws IOException {
         this.client = clientSocket;
+        this.clients = clients;
         input = new DataInputStream(new BufferedInputStream(this.client.getInputStream()));
+        output = new DataOutputStream(this.client.getOutputStream());
     }
 
     @Override
@@ -26,7 +31,7 @@ public class ClientHandler implements Runnable {
 				try {
 					clientMessage = input.readUTF();
 					System.out.println(clientMessage);
-
+                    broadcastMessage(clientMessage);
 				}
 				catch(IOException e) {
 					System.out.println(e);
@@ -42,6 +47,16 @@ public class ClientHandler implements Runnable {
 			System.out.println(e);
 		}
 
+    }
+
+    private void broadcastMessage(String message) {
+        for(ClientHandler client : clients) {
+            try {
+                client.output.writeUTF(message);
+            } catch (IOException e) {
+                System.out.println("Error sending message: " + e.getMessage());
+            }
+        }
     }
     
 }

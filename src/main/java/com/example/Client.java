@@ -9,6 +9,7 @@ public class Client {
 	private Socket socket;
 	private Scanner input;
 	private DataOutputStream out;
+	private DataInputStream in;
 
 
 	public Client(String address, int port) {
@@ -23,8 +24,10 @@ public class Client {
 			input = new Scanner(System.in);
 
 			// Creates the output stream to send user inputs to the socket
-			out = new DataOutputStream(
-				socket.getOutputStream());
+			out = new DataOutputStream(socket.getOutputStream());
+
+			// Input stream to get inputs from server
+			in = new DataInputStream(socket.getInputStream());
 		}
 		catch (UnknownHostException u) {
 			System.out.println(u);
@@ -34,6 +37,17 @@ public class Client {
 			System.out.println(e);
 			return;
 		}
+
+		new Thread(() -> {
+			try {
+				while (true) {
+					String serverMessage = in.readUTF();
+					System.out.println("Message from server: " + serverMessage);
+				}
+			} catch (IOException e) {
+				System.out.println("Disconnected from server");
+			}
+		}).start();
 
 		// variable to store user input
 		String message = "";

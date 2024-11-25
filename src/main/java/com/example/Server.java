@@ -26,7 +26,7 @@ public class Server {
             	// Accepts connection with client
 				socket = server.accept();
 				System.out.println("Client accepted");
-				ClientHandler clientThread = new ClientHandler(socket);
+				ClientHandler clientThread = new ClientHandler(socket, clients);
 				clients.add(clientThread);
 
 				pool.execute(clientThread);
