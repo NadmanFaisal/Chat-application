@@ -11,8 +11,7 @@ public class Client {
 	private DataOutputStream out;
 
 
-	public Client(String address, int port)
-	{
+	public Client(String address, int port) {
 
 		try {
 

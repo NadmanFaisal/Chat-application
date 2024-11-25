@@ -1,6 +1,9 @@
 package com.example;
 
 import java.net.*;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.io.*;
 
 public class Server {
@@ -8,6 +11,8 @@ public class Server {
 	private Socket socket = null;
 	private ServerSocket server = null;
 	private DataInputStream input = null;
+	private ArrayList<ClientHandler> clients = new ArrayList<>();
+	private ExecutorService pool = Executors.newFixedThreadPool(4);
 
 
 	public Server(int port) {
@@ -17,41 +22,24 @@ public class Server {
 			server = new ServerSocket(port);
 			System.out.println("Server started");
 
-			System.out.println("Waiting for a client ...");
+			while(true) {
+            	// Accepts connection with client
+				socket = server.accept();
+				System.out.println("Client accepted");
+				ClientHandler clientThread = new ClientHandler(socket);
+				clients.add(clientThread);
 
-            // Accepts connection with client
-			socket = server.accept();
-			System.out.println("Client accepted");
-
-			// Creates inputstream to get input from client
-			input = new DataInputStream(
-				new BufferedInputStream(socket.getInputStream()));
-
-			String clientMessage = "";
-
-			// Reads messages sent from the client until
-			while (!clientMessage.equals("Over")) {
-				try {
-					clientMessage = input.readUTF();
-					System.out.println(clientMessage);
-
-				}
-				catch(IOException e) {
-					System.out.println(e);
-				}
+				pool.execute(clientThread);
 			}
-			System.out.println("Closing connection");
 
-			// Close connections to avoid leaks
-			socket.close();
-			input.close();
+			
 		}
 		catch(IOException e) {
 			System.out.println(e);
 		}
 	}
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws IOException {
 		Server server = new Server(5000);
 	}
 }
