@@ -1,8 +1,11 @@
 package com.example;
 
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
-import java.io.*;
 
 public class ClientHandler implements Runnable {
     private Socket client;
@@ -30,7 +33,6 @@ public class ClientHandler implements Runnable {
 			while (!clientMessage.equals("Over")) {
 				try {
 					clientMessage = input.readUTF();
-					System.out.println(clientMessage);
                     broadcastMessage(clientMessage);
 				}
 				catch(IOException e) {
@@ -51,10 +53,12 @@ public class ClientHandler implements Runnable {
 
     private void broadcastMessage(String message) {
         for(ClientHandler client : clients) {
-            try {
-                client.output.writeUTF(message);
-            } catch (IOException e) {
-                System.out.println("Error sending message: " + e.getMessage());
+            if(client != this) {
+                try {
+                    client.output.writeUTF(message);
+                } catch (IOException e) {
+                    System.out.println("Error sending message: " + e.getMessage());
+               }
             }
         }
     }

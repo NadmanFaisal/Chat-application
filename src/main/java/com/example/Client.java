@@ -1,10 +1,15 @@
 package com.example;
 
-import java.io.*;
-import java.net.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class Client {
+	private String name;
+	
 	// initialize socket and input output
 	private Socket socket;
 	private Scanner input;
@@ -12,7 +17,8 @@ public class Client {
 	private DataInputStream in;
 
 
-	public Client(String address, int port) {
+	public Client(String name, String address, int port) {
+		this.name = name;
 
 		try {
 
@@ -57,6 +63,8 @@ public class Client {
 			try {
 				message = input.nextLine();
 
+				message = message + ", client_name: " + this.name;
+
 				// Sends the input to the socket
 				out.writeUTF(message);
 			}
@@ -76,8 +84,13 @@ public class Client {
 		}
 	}
 
+	public String getName() {
+		return this.name;
+	}
+
 	public static void main(String args[])
 	{
-		Client client = new Client("127.0.0.1", 5000);
+		String name = "Faisal";
+		Client client = new Client(name, "127.0.0.1", 5000);
 	}
 }
