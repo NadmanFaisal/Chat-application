@@ -88,9 +88,4 @@ public class Client {
 		return this.name;
 	}
 
-	public static void main(String args[])
-	{
-		String name = "Faisal";
-		Client client = new Client(name, "127.0.0.1", 5000);
-	}
 }
