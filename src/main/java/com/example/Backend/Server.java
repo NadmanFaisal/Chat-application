@@ -1,10 +1,12 @@
-package com.example;
+package com.example.Backend;
 
-import java.net.*;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.io.*;
 
 public class Server {
 	// Initizlizss the socket, server and input

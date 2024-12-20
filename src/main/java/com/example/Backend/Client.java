@@ -1,4 +1,4 @@
-package com.example;
+package com.example.Backend;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -73,6 +73,7 @@ public class Client {
 			}
 		}
 
+		
 		// Close the connections to avoid leaks
 		try {
 			input.close();
@@ -81,6 +82,12 @@ public class Client {
 		}
 		catch (IOException e) {
 			System.out.println(e);
+		}
+	}
+	
+	public void sendMessage(String message) throws IOException {
+		synchronized (out) {
+			out.writeUTF(message + ", client_name: " + this.name);
 		}
 	}
 

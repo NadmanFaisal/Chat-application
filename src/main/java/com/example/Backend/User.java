@@ -1,4 +1,4 @@
-package com.example;
+package com.example.Backend;
 
 
 public class User {

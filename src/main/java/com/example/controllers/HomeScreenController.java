@@ -1,6 +1,6 @@
 package com.example.controllers;
 
-import com.example.User;
+import com.example.Backend.User;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
