@@ -7,11 +7,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class HelloFX extends Application {
+public class Main extends Application {
 
 	@Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloFX.class.getResource("UI/homeScreen.fxml"));
+		System.out.println(Main.class.getResource("UI/homeScreen.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("UI/homeScreen.fxml"));
 		Scene scene = new Scene(fxmlLoader.load());
 		stage.setTitle("Hello!");
 		stage.setScene(scene);
@@ -20,7 +21,5 @@ public class HelloFX extends Application {
     public static void main(String args[]) {
 
 		launch();
-		// String name = "Faisal";
-		// Client client = new Client(name, "127.0.0.1", 5000);
 	}
 }

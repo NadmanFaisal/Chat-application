@@ -5,8 +5,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="479.0" prefWidth="354.0" style="-fx-background-color: #f5a442;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.HomeScreenController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="479.0" prefWidth="354.0" style="-fx-background-color: #f5a442;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.controllers.HomeScreenController">
    <children>
       <GridPane prefHeight="400.0" prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -23,7 +22,7 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <TextField fx:id="usernameField" onAction="#setUserName" prefHeight="29.0" prefWidth="221.0" promptText="Select username..." GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3">
+            <TextField fx:id="usernameField" onAction="#createUser" prefHeight="29.0" prefWidth="221.0" promptText="Select username..." GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3">
                <font>
                   <Font size="15.0" />
                </font>
@@ -33,6 +32,7 @@
                   <Text layoutX="38.0" layoutY="53.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to Chat!!" />
                </children>
             </AnchorPane>
+            <Button mnemonicParsing="false" onAction="#createUser" prefHeight="29.0" prefWidth="184.0" text="Create User" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
          </children>
       </GridPane>
    </children>
