@@ -5,94 +5,93 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Client {
-	private String name;
-	
-	// initialize socket and input output
-	private Socket socket;
-	private Scanner input;
-	private DataOutputStream out;
-	private DataInputStream in;
+    private static final Logger logger = Logger.getLogger(Client.class.getName());
 
+    private String name;
+    private Socket socket;
+    private DataOutputStream out;
+    private DataInputStream in;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+	private Consumer<String> messageListener;
 
-	public Client(String name, String address, int port) {
-		this.name = name;
+    public Client(String name, String address, int port) throws IOException {
+        this.name = name;
+        connectToServer(address, port);
+    }
 
-		try {
+    private void connectToServer(String address, int port) throws IOException {
+        try {
+            socket = new Socket(address, port);
+            logger.info("Connected to server at " + address + ":" + port);
 
-			// Establishes connection using the address and port
-			socket = new Socket(address, port);
-			System.out.println("Connected");
+            // Initialize I/O streams
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new DataInputStream(socket.getInputStream());
 
-			// Creates input stream to gather user inputs
-			input = new Scanner(System.in);
+            startListening();
+        } catch (UnknownHostException e) {
+            throw new IOException("Unknown host: " + address, e);
+        } catch (IOException e) {
+            throw new IOException("Could not establish connection to " + address + ":" + port, e);
+        }
+    }
 
-			// Creates the output stream to send user inputs to the socket
-			out = new DataOutputStream(socket.getOutputStream());
-
-			// Input stream to get inputs from server
-			in = new DataInputStream(socket.getInputStream());
-		}
-		catch (UnknownHostException u) {
-			System.out.println(u);
-			return;
-		}
-		catch (IOException e) {
-			System.out.println(e);
-			return;
-		}
-
-		new Thread(() -> {
-			try {
-				while (true) {
-					String serverMessage = in.readUTF();
-					System.out.println("Message from server: " + serverMessage);
-				}
-			} catch (IOException e) {
-				System.out.println("Disconnected from server");
-			}
-		}).start();
-
-		// variable to store user input
-		String message = "";
-
-		// keep reading until "Over" is input
-		while (!message.equals("Over")) {
-			try {
-				message = input.nextLine();
-
-				message = message + ", client_name: " + this.name;
-
-				// Sends the input to the socket
-				out.writeUTF(message);
-			}
-			catch (IOException e) {
-				System.out.println(e);
-			}
-		}
-
-		
-		// Close the connections to avoid leaks
-		try {
-			input.close();
-			out.close();
-			socket.close();
-		}
-		catch (IOException e) {
-			System.out.println(e);
-		}
-	}
-	
-	public void sendMessage(String message) throws IOException {
-		synchronized (out) {
-			out.writeUTF(message + ", client_name: " + this.name);
-		}
+	public void setOnMessageReceived(Consumer<String> listener) {
+		this.messageListener = listener;
 	}
 
-	public String getName() {
-		return this.name;
-	}
+    // Listens for messages from other client through server
+    private void startListening() {
+        executor.submit(() -> {
+            try {
+                while (!socket.isClosed()) {
+                    String serverMessage = in.readUTF();
+                    logger.info("Message from server: " + serverMessage);
 
+					if (messageListener != null) {
+                        messageListener.accept(serverMessage);
+                    }
+                }
+            } catch (IOException e) {
+                logger.warning("Connection to server lost: " + e.getMessage());
+                close();
+            }
+        });
+    }
+
+    // Send message to other clients through server
+    public void sendMessage(String message) {
+        try {
+            synchronized (out) {
+                out.writeUTF(this.name + ": " + message);
+                out.flush();
+            }
+        } catch (IOException e) {
+            logger.warning("Failed to send message: " + e.getMessage());
+        }
+    }
+
+    // Close all resources
+    public void close() {
+        try {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+                logger.info("Client connection closed.");
+            }
+            executor.shutdownNow();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error closing client resources", e);
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
 }
